@@ -17,12 +17,16 @@ module JetsGemLayer
     end
 
     def self.arn
+      @arn ||= new.arn
+    end
+
+    def arn
       # We do not want to do any of this when running in the lambda environment
       # as it is only required for deployment.
       @arn ||= if ENV['LAMBDA_TASK_ROOT']
                  'no-op-while-running-in-lambda'
                else
-                 new.published_arn
+                 published_arn
                end
 
       @arn ||= 'no-matching-arn-published-to-aws'
