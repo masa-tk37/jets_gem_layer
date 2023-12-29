@@ -14,7 +14,7 @@ is correctly set for your project.
 
 ## Installation
 
-1. Jets pro would typically be disabled when using this gem.
+1. Jets Pro would typically be disabled when using this gem so as to not generate multiple Lambda Layers.
 
 ```ruby
 # config/application.rb
@@ -74,7 +74,7 @@ Dependencies will be installed within the build container and copied into the pu
 ## Deployment
 Within your project directory (example for development environment):
 1. run `JETS_ENV=development rake gem_layer:build_and_publish`
-2. run `JETS_ENV=development rake jets deploy`
+2. run `JETS_ENV=development jets deploy`
 
 ## Acknowledgements
 A big thank you to the authors of [Lambda Layer Cake](https://github.com/loganb/lambda-layer-cake), which served as a reference.
