@@ -7,23 +7,24 @@ require 'open3'
 require 'fileutils'
 
 def main
+  warn('Installing yum package manager...')
   unless system('yum', 'install', '-y', 'yum-utils')
-    warn("Could not install yum-utils, exit code #{$CHILD_STATUS}")
+    warn("Could not install yum-utils, exit code #{$CHILD_STATUS}, aborting...")
     exit 1
   end
 
   Dir.chdir('/tmp/inputs')
 
   if ENV['GEM_LAYER_PACKAGE_DEPENDENCIES']
-    warn("Installing package dependencies: #{ENV.fetch('GEM_LAYER_PACKAGE_DEPENDENCIES')}")
+    warn("Installing package dependencies: #{ENV.fetch('GEM_LAYER_PACKAGE_DEPENDENCIES')}...")
     gem_deps = ENV.fetch('GEM_LAYER_PACKAGE_DEPENDENCIES').split(',')
     unless system('yum', 'install', '-y', *gem_deps)
-      warn('Could not install build dependency packages')
+      warn('Could not install build dependency packages, aborting...')
       exit 2
     end
   end
 
-  warn('Building Gems')
+  warn('Building gems...')
   FileUtils.mkdir_p('/tmp/build/bundle')
   system('bundle', 'lock', '--add-platform', 'x86_64-linux')
   system('bundle', 'config', 'set', '--local', 'deployment', 'true')
@@ -33,7 +34,7 @@ def main
     exit 3
   end
 
-  warn('Copying libs')
+  warn('Copying libs...')
   required_libs = Set.new
   yum_cache = Hash.new do |h, k|
     pkgs_str, = Open3.capture2('repoquery', '-f', k)
@@ -68,7 +69,7 @@ def main
   FileUtils.mv('/tmp/outputs/ruby/ruby', '/tmp/outputs/ruby/gems')
   FileUtils.chmod_R(0o755, '/tmp/outputs')
 
-  warn('Successfully generated gems and dependencies')
+  warn('Successfully generated gems and dependencies...')
 end
 
 main

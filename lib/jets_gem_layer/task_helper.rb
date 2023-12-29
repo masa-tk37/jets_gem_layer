@@ -29,7 +29,7 @@ module JetsGemLayer
                  published_arn
                end
 
-      @arn ||= 'no-matching-arn-published-to-aws'
+      @arn ||= 'no-matching-gem-layer-found'
     end
 
     def install
@@ -84,6 +84,7 @@ module JetsGemLayer
       begin
         Dir.chdir(outputs_dir)
         system(*%W[zip -r #{File.join(working_dir, "#{layer_name}.zip")} lib ruby], out: File::NULL) or raise
+        puts "Layer zipped successfully..."
       ensure
         Dir.chdir(pwd)
       end
@@ -95,6 +96,7 @@ module JetsGemLayer
         description: layer_version_description,
         content: { zip_file: File.read(zip_file_path) }
       )
+      puts "#{layer_name} published for #{layer_version_description}..."
     end
 
     private
