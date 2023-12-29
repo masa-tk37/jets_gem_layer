@@ -37,6 +37,7 @@ module JetsGemLayer
     def install_build
       desc 'Build the gem layer zip file'
       task :build do
+        Rake::Task['gem_layer:clean'].invoke
         build_layer
         zip_layer
       end
@@ -105,7 +106,7 @@ module JetsGemLayer
     end
 
     def layer_name
-      "#{Jets.project_namespace}-ruby-#{RUBY_VERSION.underscore}-gem_layer"
+      "#{Jets.project_namespace}-ruby-#{RUBY_VERSION.gsub('.','_')}-gem_layer"
     end
 
     def zip_file_path
