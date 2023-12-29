@@ -2,7 +2,6 @@ PATH
   remote: .
   specs:
     jets_gem_layer (1.0.0)
-      aws-sdk-lambda
       jets (~> 5.0)
       rake
 

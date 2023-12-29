@@ -20,6 +20,7 @@ module JetsGemLayer
       namespace :gem_layer do
         install_build_and_publish
         install_build
+        install_publish
         install_clean
       end
     end
@@ -43,7 +44,7 @@ module JetsGemLayer
 
     def install_publish
       desc 'Publish a built layer zip file'
-      task :build do
+      task :publish do
         publish_layer
       end
     end
