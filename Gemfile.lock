@@ -1,0 +1,292 @@
+PATH
+  remote: .
+  specs:
+    jets_gem_layer (1.0.0)
+      aws-sdk-lambda
+      jets (~> 5.0)
+      rake
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    actionmailer (7.0.8)
+      actionpack (= 7.0.8)
+      actionview (= 7.0.8)
+      activejob (= 7.0.8)
+      activesupport (= 7.0.8)
+      mail (~> 2.5, >= 2.5.4)
+      net-imap
+      net-pop
+      net-smtp
+      rails-dom-testing (~> 2.0)
+    actionpack (7.0.8)
+      actionview (= 7.0.8)
+      activesupport (= 7.0.8)
+      rack (~> 2.0, >= 2.2.4)
+      rack-test (>= 0.6.3)
+      rails-dom-testing (~> 2.0)
+      rails-html-sanitizer (~> 1.0, >= 1.2.0)
+    actionview (7.0.8)
+      activesupport (= 7.0.8)
+      builder (~> 3.1)
+      erubi (~> 1.4)
+      rails-dom-testing (~> 2.0)
+      rails-html-sanitizer (~> 1.1, >= 1.2.0)
+    activejob (7.0.8)
+      activesupport (= 7.0.8)
+      globalid (>= 0.3.6)
+    activemodel (7.0.8)
+      activesupport (= 7.0.8)
+    activerecord (7.0.8)
+      activemodel (= 7.0.8)
+      activesupport (= 7.0.8)
+    activesupport (7.0.8)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
+    ast (2.4.2)
+    aws-eventstream (1.3.0)
+    aws-logs (0.5.1)
+      activesupport
+      aws-mfa-secure
+      aws-sdk-cloudwatchlogs
+      rainbow
+      thor
+      zeitwerk
+    aws-mfa-secure (0.4.4)
+      activesupport
+      aws-sdk-core
+      aws_config
+      memoist
+      rainbow
+      thor
+      zeitwerk
+    aws-partitions (1.875.0)
+    aws-sdk-apigateway (1.90.0)
+      aws-sdk-core (~> 3, >= 3.188.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-cloudformation (1.97.0)
+      aws-sdk-core (~> 3, >= 3.188.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-cloudwatchlogs (1.76.0)
+      aws-sdk-core (~> 3, >= 3.188.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-core (3.190.1)
+      aws-eventstream (~> 1, >= 1.3.0)
+      aws-partitions (~> 1, >= 1.651.0)
+      aws-sigv4 (~> 1.8)
+      jmespath (~> 1, >= 1.6.1)
+    aws-sdk-dynamodb (1.98.0)
+      aws-sdk-core (~> 3, >= 3.188.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-kinesis (1.54.0)
+      aws-sdk-core (~> 3, >= 3.188.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-kms (1.75.0)
+      aws-sdk-core (~> 3, >= 3.188.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-lambda (1.113.0)
+      aws-sdk-core (~> 3, >= 3.188.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-s3 (1.142.0)
+      aws-sdk-core (~> 3, >= 3.189.0)
+      aws-sdk-kms (~> 1)
+      aws-sigv4 (~> 1.8)
+    aws-sdk-sns (1.70.0)
+      aws-sdk-core (~> 3, >= 3.188.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-sqs (1.69.0)
+      aws-sdk-core (~> 3, >= 3.188.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-ssm (1.162.0)
+      aws-sdk-core (~> 3, >= 3.188.0)
+      aws-sigv4 (~> 1.1)
+    aws-sigv4 (1.8.0)
+      aws-eventstream (~> 1, >= 1.0.2)
+    aws_config (0.1.1)
+    builder (3.2.4)
+    cfn-status (0.5.0)
+      aws-sdk-cloudformation
+    cfn_camelizer (0.5.0)
+      activesupport
+      memoist
+      rainbow
+    cfn_response (0.2.0)
+    cli-format (0.5.0)
+      activesupport
+      text-table
+      zeitwerk
+    concurrent-ruby (1.2.2)
+    crass (1.0.6)
+    date (3.3.4)
+    diff-lcs (1.5.0)
+    dotenv (2.8.1)
+    dsl_evaluator (0.3.1)
+      activesupport
+      memoist
+      rainbow
+      zeitwerk
+    erubi (1.12.0)
+    gems (1.2.0)
+    globalid (1.2.1)
+      activesupport (>= 6.1)
+    hashie (5.0.0)
+    i18n (1.14.1)
+      concurrent-ruby (~> 1.0)
+    jets (5.0.8)
+      actionmailer (~> 7.0.8)
+      actionpack (~> 7.0.8)
+      actionview (~> 7.0.8)
+      activerecord (~> 7.0.8)
+      activesupport (~> 7.0.8)
+      aws-logs
+      aws-mfa-secure (~> 0.4.0)
+      aws-sdk-apigateway
+      aws-sdk-cloudformation
+      aws-sdk-cloudwatchlogs
+      aws-sdk-dynamodb
+      aws-sdk-kinesis
+      aws-sdk-lambda
+      aws-sdk-s3
+      aws-sdk-sns
+      aws-sdk-sqs
+      aws-sdk-ssm
+      cfn-status (>= 0.5.0)
+      cfn_camelizer (>= 0.4.9)
+      cfn_response
+      cli-format (>= 0.4.0)
+      dotenv
+      dsl_evaluator (>= 0.3.0)
+      gems
+      hashie
+      jets-api (>= 0.1.4)
+      jets-git
+      jets-html-sanitizer
+      kramdown
+      memoist
+      mini_mime
+      rack
+      railties (~> 7.0.8)
+      rainbow
+      recursive-open-struct
+      text-table
+      thor
+      zeitwerk (>= 2.6.0)
+    jets-api (0.1.5)
+    jets-git (0.2.1)
+      activesupport
+      memoist
+      rainbow
+      zeitwerk
+    jets-html-sanitizer (1.0.4)
+      loofah (~> 2.2, >= 2.2.2)
+    jmespath (1.6.2)
+    json (2.7.1)
+    kramdown (2.4.0)
+      rexml
+    language_server-protocol (3.17.0.3)
+    loofah (2.22.0)
+      crass (~> 1.0.2)
+      nokogiri (>= 1.12.0)
+    mail (2.8.1)
+      mini_mime (>= 0.1.1)
+      net-imap
+      net-pop
+      net-smtp
+    memoist (0.16.2)
+    method_source (1.0.0)
+    mini_mime (1.1.5)
+    minitest (5.20.0)
+    net-imap (0.4.9)
+      date
+      net-protocol
+    net-pop (0.1.2)
+      net-protocol
+    net-protocol (0.2.2)
+      timeout
+    net-smtp (0.4.0)
+      net-protocol
+    nokogiri (1.16.0-arm64-darwin)
+      racc (~> 1.4)
+    parallel (1.24.0)
+    parser (3.2.2.4)
+      ast (~> 2.4.1)
+      racc
+    racc (1.7.3)
+    rack (2.2.8)
+    rack-test (2.1.0)
+      rack (>= 1.3)
+    rails-dom-testing (2.2.0)
+      activesupport (>= 5.0.0)
+      minitest
+      nokogiri (>= 1.6)
+    rails-html-sanitizer (1.6.0)
+      loofah (~> 2.21)
+      nokogiri (~> 1.14)
+    railties (7.0.8)
+      actionpack (= 7.0.8)
+      activesupport (= 7.0.8)
+      method_source
+      rake (>= 12.2)
+      thor (~> 1.0)
+      zeitwerk (~> 2.5)
+    rainbow (3.1.1)
+    rake (13.1.0)
+    recursive-open-struct (1.1.3)
+    regexp_parser (2.8.3)
+    rexml (3.2.6)
+    rspec (3.12.0)
+      rspec-core (~> 3.12.0)
+      rspec-expectations (~> 3.12.0)
+      rspec-mocks (~> 3.12.0)
+    rspec-core (3.12.2)
+      rspec-support (~> 3.12.0)
+    rspec-expectations (3.12.3)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.12.0)
+    rspec-mocks (3.12.6)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.12.0)
+    rspec-support (3.12.1)
+    rubocop (1.59.0)
+      json (~> 2.3)
+      language_server-protocol (>= 3.17.0)
+      parallel (~> 1.10)
+      parser (>= 3.2.2.4)
+      rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 1.8, < 3.0)
+      rexml (>= 3.2.5, < 4.0)
+      rubocop-ast (>= 1.30.0, < 2.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 2.4.0, < 3.0)
+    rubocop-ast (1.30.0)
+      parser (>= 3.2.1.0)
+    rubocop-capybara (2.19.0)
+      rubocop (~> 1.41)
+    rubocop-factory_bot (2.24.0)
+      rubocop (~> 1.33)
+    rubocop-rspec (2.25.0)
+      rubocop (~> 1.40)
+      rubocop-capybara (~> 2.17)
+      rubocop-factory_bot (~> 2.22)
+    ruby-progressbar (1.13.0)
+    text-table (1.2.4)
+    thor (1.3.0)
+    timeout (0.4.1)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
+    unicode-display_width (2.5.0)
+    zeitwerk (2.6.12)
+
+PLATFORMS
+  arm64-darwin-23
+
+DEPENDENCIES
+  jets_gem_layer!
+  rspec
+  rubocop
+  rubocop-rspec
+
+BUNDLED WITH
+   2.5.3
