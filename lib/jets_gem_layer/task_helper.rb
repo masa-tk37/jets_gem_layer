@@ -88,6 +88,9 @@ module JetsGemLayer
       return 'no-op-while-running-in-lambda' if ENV['LAMBDA_TASK_ROOT']
 
       @arn ||= find_published_arn
+      return @arn if @arn.present?
+
+      'no-matching-arn-published-to-aws'
     end
 
     private

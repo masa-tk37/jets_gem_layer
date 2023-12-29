@@ -1,21 +1,20 @@
 # Jets Gem Layer
-This gem provides Rake tasks to create and publish an AWS Lambda Layer from project gems and
-their linked libraries. Designed for use with Ruby on Jets 5 as part of your deployment, as an
-alternative to Jets Pro.
+This gem provides a framework for automatically creating and publish an AWS Lambda Layer from project gems and
+their linked libraries for use with [Ruby on Jets](https://github.com/rubyonjets/jets).
 
 This gem creates a Lambda Layer based on your Jets project namespace and ruby version. I.e. for the app `demo` in `production` environment, 
-the Lambda Layer `demo-prod-ruby-3-2-2-gem_layer` will be created or its version incremented as needed. A new version is published when
-Gemfile.lock and/or Gemfile is changed (which is tracked based on a hash added to the Lambda Layer version description).
+the Lambda Layer `demo-prod-ruby-3_2_2-gem_layer` will be created or its version incremented as needed. A new version is published whenever your
+Gemfile.lock and/or Gemfile is changed (this is tracked based on a hash value stored in the Lambda Layer version description).
 
 * The gem's build task runs in a docker container, i.e. `public.ecr.aws/sam/build-ruby:3.2`. The container version
 is based on the current minor ruby version (i.e. 3.2 for ruby 3.2.2, so ensure your build environment's ruby version
 is correctly set for your project.
 * Docker is a prerequisite and must be installed to use this gem.
-* This gem has not been tested to work on windows machines
+* This gem has not been tested to work on windows machines.
 
 ## Installation
 
-1. Jets pro should be disabled, as multiple layers with project dependencies would be duplicative.
+1. Jets pro should be disabled, as multiple layers with the same project dependencies would be duplicative.
 
 ```ruby
 # config/application.rb
@@ -24,7 +23,7 @@ config.pro.disable = true
 ```
 
 2. The layer ARN created by this gem must be inserted so it is referenced on app deployment. The easiest way to do this
-is to add it to your environment configuration.
+is to add the included helper to your environment configuration.
 
 ```ruby
 # config/production.rb
@@ -32,7 +31,7 @@ is to add it to your environment configuration.
 # JetsGemLayer.arn will resolve to the latest version of the published Layer, also looking for a correct hash in the
 # layer description indicating the current Gemfile.lock and Gemfile are supported.
 # If a suitable layer is not found, the gem will log an error and resolve to 'error-fetching-gem-layer-arn' which will allow your
-# application to run locally but ensure `jets deploy` will fail if attempted prior to publishing the gem layer
+# application to run locally but hopefully prevent an invalid deployment
 config.lambda.layers = [JetsGemLayer.arn]
 ```
 
@@ -47,7 +46,6 @@ gem 'jets_gem_layer'
 # Rakefile
 
 require 'jets'
-require 'jets_gem_layer'
 require_relative 'config/application'
 
 Jets.application.load_tasks
@@ -65,7 +63,7 @@ rake gem_layer:clean               # Clean up the gem's tmp files
 
 ## Configuration
 
-The following environmental variables may be used::
+The following environmental variables may be used:
 * `GEM_LAYER_ENV`: Comma-separated `key=value` pairs which will be added to the docker build environment.
 For example, to pass a Gemfury token for Bundler, you could use `GEM_LAYER_ENV="BUNDLE_GEM__FURY__IO=xxyyzz"`
 and `BUNDLE_GEM__FURY__IO` will be set correctly within the build container.
