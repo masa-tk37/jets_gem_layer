@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    jets_gem_layer (1.0.0)
+    jets_gem_layer (0.1)
       jets (~> 5.0)
       rake
 

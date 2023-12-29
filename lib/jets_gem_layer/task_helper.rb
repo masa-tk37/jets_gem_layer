@@ -84,7 +84,7 @@ module JetsGemLayer
       begin
         Dir.chdir(outputs_dir)
         system(*%W[zip -r #{File.join(working_dir, "#{layer_name}.zip")} lib ruby], out: File::NULL) or raise
-        puts "Layer zipped successfully..."
+        puts 'Layer zipped successfully...'
       ensure
         Dir.chdir(pwd)
       end
