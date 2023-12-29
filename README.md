@@ -14,7 +14,7 @@ is correctly set for your project.
 
 ## Installation
 
-1. Jets pro should be disabled, as multiple layers with the same project dependencies would be duplicative.
+1. Jets pro would typically be disabled when using this gem.
 
 ```ruby
 # config/application.rb

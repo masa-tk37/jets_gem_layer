@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Substantial portions of this file attributed to lambda_layer_cake (c) 2019 Logan Bowers
+
 require 'English'
 require 'open3'
 require 'fileutils'
@@ -14,8 +16,8 @@ def main
 
   if ENV['GEM_LAYER_PACKAGE_DEPENDENCIES']
     warn("Installing package dependencies: #{ENV.fetch('GEM_LAYER_PACKAGE_DEPENDENCIES')}")
-    build_deps = ENV.fetch('GEM_LAYER_PACKAGE_DEPENDENCIES').split(',')
-    unless system('yum', 'install', '-y', *build_deps)
+    gem_deps = ENV.fetch('GEM_LAYER_PACKAGE_DEPENDENCIES').split(',')
+    unless system('yum', 'install', '-y', *gem_deps)
       warn('Could not install build dependency packages')
       exit 2
     end
@@ -31,9 +33,9 @@ def main
     exit 3
   end
 
-  warn('Locating dynamic library dependencies')
-  libs = Set.new
-  repoquery_cache = Hash.new do |h, k| # Reduce calls to repoquery
+  warn('Copying libs')
+  required_libs = Set.new
+  yum_cache = Hash.new do |h, k|
     pkgs_str, = Open3.capture2('repoquery', '-f', k)
     h[k] = pkgs_str
   end
@@ -48,13 +50,13 @@ def main
     next unless deps.length.positive?
 
     deps.each do |dep|
-      pkgs = repoquery_cache[dep].split("\n")
-      libs << dep if pkgs.length.positive?
+      pkgs = yum_cache[dep].split("\n")
+      required_libs << dep if pkgs.length.positive?
     end
   end
 
   FileUtils.mkdir_p('/tmp/outputs/lib')
-  FileUtils.cp(libs.to_a, '/tmp/outputs/lib')
+  FileUtils.cp(required_libs.to_a, '/tmp/outputs/lib')
 
   # These files are not needed at runtime
   FileUtils.rm_rf(Dir['/tmp/build/bundle/ruby/*/cache'])

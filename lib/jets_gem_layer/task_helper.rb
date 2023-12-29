@@ -67,8 +67,7 @@ module JetsGemLayer
       pwd = Dir.pwd
       begin
         Dir.chdir(outputs_dir)
-        cmd = %W[zip -r #{File.join(working_dir, "#{layer_name}.zip")} lib ruby]
-        system(*cmd) or raise
+        system(*%W[zip -r #{File.join(working_dir, "#{layer_name}.zip")} lib ruby], :out => File::NULL) or raise
       ensure
         Dir.chdir(pwd)
       end
