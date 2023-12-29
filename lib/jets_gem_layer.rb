@@ -13,6 +13,6 @@ module JetsGemLayer
   end
 
   def self.arn
-    JetsGemLayer::TaskHelper.new.arn
+    JetsGemLayer::TaskHelper.arn
   end
 end

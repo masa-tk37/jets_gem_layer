@@ -16,6 +16,18 @@ module JetsGemLayer
       new.install
     end
 
+    def self.arn
+      # We do not want to do any of this when running in the lambda environment
+      # as it is only required for deployment.
+      @arn ||= if ENV['LAMBDA_TASK_ROOT']
+                 'no-op-while-running-in-lambda'
+               else
+                 new.published_arn
+               end
+
+      @arn ||= 'no-matching-arn-published-to-aws'
+    end
+
     def install
       namespace :gem_layer do
         install_build_and_publish
@@ -67,7 +79,7 @@ module JetsGemLayer
       pwd = Dir.pwd
       begin
         Dir.chdir(outputs_dir)
-        system(*%W[zip -r #{File.join(working_dir, "#{layer_name}.zip")} lib ruby], :out => File::NULL) or raise
+        system(*%W[zip -r #{File.join(working_dir, "#{layer_name}.zip")} lib ruby], out: File::NULL) or raise
       ensure
         Dir.chdir(pwd)
       end
@@ -75,21 +87,10 @@ module JetsGemLayer
 
     def publish_layer
       aws_lambda.publish_layer_version(
-        layer_name: layer_name, # required
+        layer_name:, # required
         description: layer_version_description,
         content: { zip_file: File.read(zip_file_path) }
       )
-    end
-
-    def arn
-      # We do not want to do any of this when running in the lambda environment
-      # as it is only required for deployment
-      return 'no-op-while-running-in-lambda' if ENV['LAMBDA_TASK_ROOT']
-
-      @arn ||= find_published_arn
-      return @arn if @arn.present?
-
-      'no-matching-arn-published-to-aws'
     end
 
     private
@@ -108,7 +109,11 @@ module JetsGemLayer
     end
 
     def layer_name
-      "#{Jets.project_namespace}-ruby-#{RUBY_VERSION.gsub('.','_')}-gem_layer"
+      "#{Jets.project_namespace}-ruby-#{RUBY_VERSION.gsub('.', '_')}-gem_layer"
+    end
+
+    def layer_version_description
+      @layer_version_description ||= "Dependency Hash: #{input_hash}"
     end
 
     def zip_file_path
@@ -146,33 +151,23 @@ module JetsGemLayer
       end
 
       cmd.push(*%W[public.ecr.aws/sam/build-ruby#{docker_tag} ruby build_layer.rb])
-      cmd
     end
 
-    def find_published_arn
-      begin
-        marker = nil
-        loop do
-          page = all_layers(marker)
-          marker = page.next_marker
-          matching_arn = page.layers.detect do |l|
-            l.layer_name == layer_name && l.latest_matching_version.description == layer_version_description
-          end&.latest_matching_version&.layer_version_arn
+    def published_arn
+      return nil unless published?
 
-          return matching_arn if matching_arn.present? || marker.nil?
-        end
-      rescue StandardError => ex
-        Jets.logger.error('Could not resolve lambda layer arn')
-        return 'error-fetching-gem-layer-arn'
-      end
+      published_layer_version.layer_version_arn
+    rescue StandardError
+      Jets.logger.error('Could not resolve lambda layer arn')
+      'error-fetching-gem-layer-arn'
     end
 
-    def layer_version_description
-      @layer_version_description ||= "Dependency Hash: #{input_hash}"
+    def published?
+      published_layer_version&.description == layer_version_description
     end
 
-    def all_layers(marker=nil)
-      aws_lambda.list_layers({max_items:50, marker: marker})
+    def published_layer_version
+      @published_layer_version ||= aws_lambda.list_layer_versions({ layer_name: }).layer_versions&.first
     end
   end
 end
