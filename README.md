@@ -74,7 +74,7 @@ specific to your Gemfile. For example, to build the `mysql2` gem you will need t
 Dependencies will be installed within the build container and copied into the published Lambda Layer.
 
 ## Deployment
-Within your project directory (example for development environment):
+Within your project directory (example for development environment) or through your CI/CD platform:
 1. `JETS_ENV=development JETS_AGREE=no rake gem_layer:build_and_publish`
    * If needed, builds and publishes a new gem layer version based on the current Jets namespace, Gemfile.lock and Gemfile
 2. `JETS_ENV=development JETS_AGREE=no jets deploy`

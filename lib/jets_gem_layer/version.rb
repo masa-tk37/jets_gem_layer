@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module JetsGemLayer
-  VERSION = '0.2'
+  VERSION = '1.0.0'
 end
