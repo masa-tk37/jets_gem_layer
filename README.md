@@ -14,7 +14,7 @@ is correctly set for your project.
 
 ## Installation
 
-1. Jets Pro would typically be disabled when using this gem so as to not generate multiple Lambda Layers.
+1. Jets Pro would typically be disabled when using this gem so as to not generate duplicative Lambda Layers.
 
 ```ruby
 # config/application.rb
@@ -55,10 +55,12 @@ JetsGemLayer.load_tasks
 3. After running `bundle install`, run `rake -T` and you should see this Gem's tasks available for use.
 ```
 ➜ rake -T
-rake gem_layer:build_and_publish   # Build, publish, and clean
-rake gem_layer:build               # Build the gem layer zip file
-rake gem_layer:publish             # Publish the built gem laye zip to AWS
-rake gem_layer:clean               # Clean up the gem's tmp files
+rake gem_layer:build_and_publish            # Build, publish, and clean (will be a no-op if already published)
+rake gem_layer:build                        # Build the gem layer zip file
+rake gem_layer:publish                      # Publish the built gem laye zip to AWS
+rake gem_layer:clean                        # Clean up the gem's tmp files
+rake gem_layer:cleanup_published            # Deletes all prior versions of the lamda layer from AWS
+rake gem_layer:delete_all_published         # Deletes all versions of the lamda layer from AWS
 ```
 
 ## Configuration
@@ -73,8 +75,12 @@ Dependencies will be installed within the build container and copied into the pu
 
 ## Deployment
 Within your project directory (example for development environment):
-1. run `JETS_ENV=development rake gem_layer:build_and_publish`
-2. run `JETS_ENV=development jets deploy`
+1. `JETS_ENV=development JETS_AGREE=no rake gem_layer:build_and_publish`
+   * If needed, builds and publishes a new gem layer version based on the current Jets namespace, Gemfile.lock and Gemfile
+2. `JETS_ENV=development JETS_AGREE=no jets deploy`
+   * Deploy your application
+3. `JETS_ENV=development JETS_AGREE=no rake gem_layer:cleanup_published`
+   * After a successful deploy, you may run this to cleanup the old gem layer version(s) no longer in use
 
 ## Acknowledgements
 A big thank you to the authors of [Lambda Layer Cake](https://github.com/loganb/lambda-layer-cake), which served as a reference.

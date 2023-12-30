@@ -38,12 +38,18 @@ module JetsGemLayer
         install_build
         install_publish
         install_clean
+        install_cleanup_published
+        install_delete_all_published
       end
     end
 
     def install_build_and_publish
-      desc 'Build and publish a gem layer version'
+      desc 'Build and publish a gem layer version, if necessary'
       task :build_and_publish do
+        if published?
+          puts "#{layer_name} already published for #{layer_version_description}. Not doing anything!"
+          break
+        end
         Rake::Task['gem_layer:build'].invoke
         Rake::Task['gem_layer:publish'].invoke
         Rake::Task['gem_layer:clean'].invoke
@@ -51,7 +57,7 @@ module JetsGemLayer
     end
 
     def install_build
-      desc 'Build the gem layer zip file'
+      desc 'Build a gem layer zip file'
       task :build do
         Rake::Task['gem_layer:clean'].invoke
         build_layer
@@ -60,16 +66,30 @@ module JetsGemLayer
     end
 
     def install_publish
-      desc 'Publish a built layer zip file'
+      desc 'Publish the already built layer zip file'
       task :publish do
         publish_layer
       end
     end
 
     def install_clean
-      desc 'Clean tmp files'
+      desc 'Clean jets_gem_layer tmp files'
       task :clean do
         FileUtils.rm_r(working_dir) if File.exist?(working_dir)
+      end
+    end
+
+    def install_cleanup_published
+      desc 'Delete old layer versions from AWS (for use after deployment)'
+      task :cleanup_published do
+        cleanup_published
+      end
+    end
+
+    def install_delete_all_published
+      desc 'Delete all published versions of the gem layer from AWS'
+      task :delete_all_published do
+        delete_all_published
       end
     end
 
@@ -84,7 +104,7 @@ module JetsGemLayer
       begin
         Dir.chdir(outputs_dir)
         system(*%W[zip -r #{File.join(working_dir, "#{layer_name}.zip")} lib ruby], out: File::NULL) or raise
-        puts 'Layer zipped successfully...'
+        puts 'Layer zipped successfully!'
       ensure
         Dir.chdir(pwd)
       end
@@ -96,7 +116,7 @@ module JetsGemLayer
         description: layer_version_description,
         content: { zip_file: File.read(zip_file_path) }
       )
-      puts "#{layer_name} published for #{layer_version_description}..."
+      puts "#{layer_name} published for #{layer_version_description}!"
     end
 
     private
@@ -173,7 +193,38 @@ module JetsGemLayer
     end
 
     def published_layer_version
-      @published_layer_version ||= aws_lambda.list_layer_versions({ layer_name: }).layer_versions&.first
+      @published_layer_version ||= aws_lambda.list_layer_versions(layer_name:, max_items: 1).layer_versions.first
+    end
+
+    # paginate through all layer versions to get them all (but it's unlikely there will be more than 1 page)
+    def all_layer_versions
+      all_versions = []
+      marker = nil
+      loop do
+        page = aws_lambda.list_layer_versions(layer_name:, max_items: 50, marker:)
+        all_versions.concat page.layer_versions
+        marker = page.next_marker
+        break if marker.nil?
+      end
+      all_versions
+    end
+
+    def cleanup_published
+      all_layer_versions.each_with_index do |layer_version, i|
+        next if i.zero? # skips the current version
+
+        aws_lambda.delete_layer_version(layer_name:, version_number: layer_version.version)
+        puts "Deleted #{layer_version.layer_version_arn}"
+      end
+      puts 'Deleted all prior versions!'
+    end
+
+    def delete_all_published
+      all_layer_versions.each do |layer_version|
+        aws_lambda.delete_layer_version(layer_name:, version_number: layer_version.version)
+        puts "Deleted #{layer_version.layer_version_arn}"
+      end
+      puts 'Deleted all published versions!'
     end
   end
 end
