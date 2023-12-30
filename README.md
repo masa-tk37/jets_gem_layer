@@ -75,11 +75,11 @@ Dependencies will be installed within the build container and copied into the pu
 
 ## Deployment
 Within your project directory (example for development environment) or through your CI/CD platform:
-1. `JETS_ENV=development JETS_AGREE=no rake gem_layer:build_and_publish`
+1. `JETS_ENV=development rake gem_layer:build_and_publish`
    * If needed, builds and publishes a new gem layer version based on the current Jets namespace, Gemfile.lock and Gemfile
 2. `JETS_ENV=development JETS_AGREE=no jets deploy`
    * Deploy your application
-3. `JETS_ENV=development JETS_AGREE=no rake gem_layer:cleanup_published`
+3. `JETS_ENV=development rake gem_layer:cleanup_published`
    * After a successful deploy, you may run this to cleanup the old gem layer version(s) no longer in use
 
 ## Acknowledgements
