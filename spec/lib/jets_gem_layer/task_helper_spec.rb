@@ -143,7 +143,6 @@ RSpec.describe JetsGemLayer::TaskHelper do
         allow(instance).to receive(:published?).and_return published
         allow(instance).to receive(:clean_working_dir)
         allow(instance).to receive(:build_layer)
-        allow(instance).to receive(:zip_layer)
         allow(instance).to receive(:publish_layer)
       end
 
@@ -151,7 +150,6 @@ RSpec.describe JetsGemLayer::TaskHelper do
         Rake::Task['gem_layer:build_and_publish'].invoke
         expect(instance).to have_received(:clean_working_dir)
         expect(instance).to have_received(:build_layer)
-        expect(instance).to have_received(:zip_layer)
         expect(instance).to have_received(:publish_layer)
       end
 
@@ -169,7 +167,6 @@ RSpec.describe JetsGemLayer::TaskHelper do
             .with 'the-layer already published for build-hash. Not doing anything!'
           expect(instance).not_to have_received(:clean_working_dir)
           expect(instance).not_to have_received(:build_layer)
-          expect(instance).not_to have_received(:zip_layer)
           expect(instance).not_to have_received(:publish_layer)
         end
       end
@@ -186,7 +183,6 @@ RSpec.describe JetsGemLayer::TaskHelper do
         Rake::Task['gem_layer:build'].invoke
         expect(instance).to have_received(:clean_working_dir)
         expect(instance).to have_received(:build_layer)
-        expect(instance).to have_received(:zip_layer)
       end
     end
 

@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe JetsGemLayer do
   it 'has the correct version' do
-    expect(described_class::VERSION).to eq '1.0.0'
+    expect(described_class::VERSION).to eq '1.0.2'
   end
 
   describe '.load_tasks' do

@@ -67,7 +67,6 @@ module JetsGemLayer
       desc 'Build a gem layer zip file'
       task build: :clean do
         build_layer
-        zip_layer
       end
     end
 
