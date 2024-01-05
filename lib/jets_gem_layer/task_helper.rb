@@ -1,23 +1,30 @@
 # frozen_string_literal: true
 
 module JetsGemLayer
+  # All methods that run in the app environment, including rake tasks
   class TaskHelper
     include Rake::DSL
     include Jets::AwsServices
 
     # Files used to generate the gem layer
     INPUT_FILES = Rake::FileList.new(
-      ['Gemfile', 'Gemfile.lock'].collect { |f| File.join(Jets.root, f) }
+      %w[Gemfile Gemfile.lock].map { |f| File.join(Jets.root, f) }
     )
-    LOCAL_TMP_DIR = 'tmp/jets_gem_layer'
-    OUTPUT_DIR = File.expand_path(File.join(Jets.root, "#{LOCAL_TMP_DIR}/"))
+    OUTPUT_DIR = File.expand_path(File.join(Jets.root, 'tmp/jets_gem_layer/'))
+
+    def self.instance
+      @instance ||= new
+    end
 
     def self.install
-      new.install
+      return if @installed
+
+      instance.install
+      @installed = true
     end
 
     def self.arn
-      @arn ||= new.arn
+      instance.arn
     end
 
     def arn
@@ -34,13 +41,14 @@ module JetsGemLayer
 
     def install
       namespace :gem_layer do
-        install_build_and_publish
+        install_clean
         install_build
         install_publish
-        install_clean
+        install_build_and_publish
         install_cleanup_published
         install_delete_all_published
       end
+      true
     end
 
     def install_build_and_publish
@@ -48,18 +56,16 @@ module JetsGemLayer
       task :build_and_publish do
         if published?
           puts "#{layer_name} already published for #{layer_version_description}. Not doing anything!"
-          break
+          next
         end
         Rake::Task['gem_layer:build'].invoke
         Rake::Task['gem_layer:publish'].invoke
-        Rake::Task['gem_layer:clean'].invoke
       end
     end
 
     def install_build
       desc 'Build a gem layer zip file'
-      task :build do
-        Rake::Task['gem_layer:clean'].invoke
+      task build: :clean do
         build_layer
         zip_layer
       end
@@ -75,7 +81,7 @@ module JetsGemLayer
     def install_clean
       desc 'Clean jets_gem_layer tmp files'
       task :clean do
-        FileUtils.rm_r(working_dir) if File.exist?(working_dir)
+        clean_working_dir
       end
     end
 
@@ -96,18 +102,8 @@ module JetsGemLayer
     def build_layer
       FileUtils.mkdir_p(inputs_dir)
       FileUtils.cp(INPUT_FILES.existing, inputs_dir)
-      system(*docker_run_cmd) or raise
-    end
-
-    def zip_layer
-      pwd = Dir.pwd
-      begin
-        Dir.chdir(outputs_dir)
-        system(*%W[zip -r #{File.join(working_dir, "#{layer_name}.zip")} lib ruby], out: File::NULL) or raise
-        puts 'Layer zipped successfully!'
-      ensure
-        Dir.chdir(pwd)
-      end
+      system(*docker_run_cmd) or raise $CHILD_STATUS.to_s
+      zip_layer
     end
 
     def publish_layer
@@ -117,6 +113,57 @@ module JetsGemLayer
         content: { zip_file: File.read(zip_file_path) }
       )
       puts "#{layer_name} published for #{layer_version_description}!"
+    end
+
+    def clean_working_dir
+      FileUtils.rm_rf(working_dir)
+    end
+
+    def cleanup_published
+      all_layer_versions.each_with_index do |layer_version, i|
+        next if i.zero? # skips the current version
+
+        aws_lambda.delete_layer_version(layer_name:, version_number: layer_version.version)
+        puts "Deleted #{layer_version.layer_version_arn}"
+      end
+      puts 'Deleted all prior versions!'
+    end
+
+    def delete_all_published
+      all_layer_versions.each do |layer_version|
+        aws_lambda.delete_layer_version(layer_name:, version_number: layer_version.version)
+        puts "Deleted #{layer_version.layer_version_arn}"
+      end
+      puts 'Deleted all published versions!'
+    end
+
+    # paginate through all layer versions to get them all (but it's unlikely there will be more than 1 page)
+    def all_layer_versions
+      all_versions = []
+      marker = nil
+      loop do
+        page = aws_lambda.list_layer_versions(layer_name:, max_items: 50, marker:)
+        all_versions.concat page.layer_versions
+        marker = page.next_marker
+        break if marker.nil?
+      end
+      all_versions
+    end
+
+    def published_layer_version
+      @published_layer_version ||= aws_lambda.list_layer_versions(layer_name:, max_items: 1).layer_versions.first
+    end
+
+    def published?
+      published_layer_version&.description == layer_version_description
+    end
+
+    def published_arn
+      return nil unless published?
+
+      published_layer_version.layer_version_arn
+    rescue StandardError
+      'error-fetching-gem-layer-arn'
     end
 
     private
@@ -170,61 +217,24 @@ module JetsGemLayer
                -v #{outputs_dir}:/tmp/outputs
                -v #{File.expand_path("#{__dir__}/build_env")}:/var/task]
 
-      ENV.fetch('GEM_LAYER_ENV').split(',').each { |env| cmd.push "-e#{env}" } if ENV['GEM_LAYER_ENV']
+      ENV.fetch('GEM_LAYER_ENV').split(',').each { |env| cmd.push "-e#{env}" } if ENV.key?('GEM_LAYER_ENV')
 
-      if ENV['GEM_LAYER_PACKAGE_DEPENDENCIES']
+      if ENV.key?('GEM_LAYER_PACKAGE_DEPENDENCIES')
         cmd.push "-eGEM_LAYER_PACKAGE_DEPENDENCIES=#{ENV.fetch('GEM_LAYER_PACKAGE_DEPENDENCIES')}"
       end
 
       cmd.push(*%W[public.ecr.aws/sam/build-ruby#{docker_tag} ruby build_layer.rb])
     end
 
-    def published_arn
-      return nil unless published?
-
-      published_layer_version.layer_version_arn
-    rescue StandardError
-      Jets.logger.error('Could not resolve lambda layer arn')
-      'error-fetching-gem-layer-arn'
-    end
-
-    def published?
-      published_layer_version&.description == layer_version_description
-    end
-
-    def published_layer_version
-      @published_layer_version ||= aws_lambda.list_layer_versions(layer_name:, max_items: 1).layer_versions.first
-    end
-
-    # paginate through all layer versions to get them all (but it's unlikely there will be more than 1 page)
-    def all_layer_versions
-      all_versions = []
-      marker = nil
-      loop do
-        page = aws_lambda.list_layer_versions(layer_name:, max_items: 50, marker:)
-        all_versions.concat page.layer_versions
-        marker = page.next_marker
-        break if marker.nil?
+    def zip_layer
+      pwd = Dir.pwd
+      begin
+        Dir.chdir(outputs_dir)
+        system(*%W[zip -r #{File.join(working_dir, "#{layer_name}.zip")} lib ruby], out: File::NULL) or raise
+        puts 'Layer zipped successfully!'
+      ensure
+        Dir.chdir(pwd)
       end
-      all_versions
-    end
-
-    def cleanup_published
-      all_layer_versions.each_with_index do |layer_version, i|
-        next if i.zero? # skips the current version
-
-        aws_lambda.delete_layer_version(layer_name:, version_number: layer_version.version)
-        puts "Deleted #{layer_version.layer_version_arn}"
-      end
-      puts 'Deleted all prior versions!'
-    end
-
-    def delete_all_published
-      all_layer_versions.each do |layer_version|
-        aws_lambda.delete_layer_version(layer_name:, version_number: layer_version.version)
-        puts "Deleted #{layer_version.layer_version_arn}"
-      end
-      puts 'Deleted all published versions!'
     end
   end
 end

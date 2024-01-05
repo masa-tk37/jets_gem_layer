@@ -1,3 +1,39 @@
+require: rubocop-rspec
 inherit_from: .rubocop_todo.yml
 AllCops:
   NewCops: enable
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Max: 4
+
+Lint/MixedRegexpCaptureTypes:
+  Exclude:
+    - 'lib/jets_gem_layer/build_env/build_layer.rb'
+
+Metrics/AbcSize:
+  Exclude:
+    - 'lib/jets_gem_layer/build_env/build_layer.rb'
+
+Metrics/CyclomaticComplexity:
+  Exclude:
+    - 'lib/jets_gem_layer/build_env/build_layer.rb'
+
+Metrics/MethodLength:
+  Exclude:
+    - 'lib/jets_gem_layer/build_env/build_layer.rb'
+
+Metrics/PerceivedComplexity:
+  Exclude:
+    - 'lib/jets_gem_layer/build_env/build_layer.rb'
+
+Metrics/ClassLength:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Max: 10
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 10

@@ -6,6 +6,8 @@ require 'English'
 require 'open3'
 require 'fileutils'
 
+# This script runs in the public.ecr.aws/sam/build-ruby docker container
+# to build native gems and libs which end up in the layer zip file
 def main
   warn('Installing yum package manager...')
   unless system('yum', 'install', '-y', 'yum-utils')

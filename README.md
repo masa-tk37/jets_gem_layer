@@ -55,12 +55,12 @@ JetsGemLayer.load_tasks
 3. After running `bundle install`, run `rake -T` and you should see this Gem's tasks available for use.
 ```
 ➜ rake -T
-rake gem_layer:build_and_publish            # Build, publish, and clean (will be a no-op if already published)
-rake gem_layer:build                        # Build the gem layer zip file
-rake gem_layer:publish                      # Publish the built gem laye zip to AWS
-rake gem_layer:clean                        # Clean up the gem's tmp files
-rake gem_layer:cleanup_published            # Deletes all prior versions of the lamda layer from AWS
-rake gem_layer:delete_all_published         # Deletes all versions of the lamda layer from AWS
+rake gem_layer:build_and_publish            # Build and publish a gem layer version, if necessary
+rake gem_layer:build                        # Build a gem layer zip file
+rake gem_layer:publish                      # Publish the already built layer zip file
+rake gem_layer:clean                        # Clean jets_gem_layer tmp files
+rake gem_layer:cleanup_published            # Delete old layer versions from AWS (for use after deployment)
+rake gem_layer:delete_all_published         # Delete all published versions of the gem layer from AWS
 ```
 
 ## Configuration
