@@ -26,13 +26,22 @@ config.pro.disable = true
 is to add the included helper to your environment configuration.
 
 ```ruby
-# config/production.rb
+# config/application.rb
 
-# JetsGemLayer.arn will resolve to the latest version of the published Layer, also looking for a correct hash in the
-# layer description indicating the current Gemfile.lock and Gemfile are supported.
-# If a suitable layer is not found, the gem will log an error and resolve to 'error-fetching-gem-layer-arn' which will allow your
-# application to run locally but hopefully prevent an invalid deployment
-config.lambda.layers = [JetsGemLayer.arn]
+require 'jets_gem_layer'
+
+module CrmBroker
+   class Application < Jets::Application
+
+      # JetsGemLayer.arn will resolve to the latest version of the published Layer, also looking for a correct hash in the
+      # layer description indicating the current Gemfile.lock and Gemfile are supported.
+      # If a suitable layer is not found, the gem will log an error and resolve to 'error-fetching-gem-layer-arn' which will allow your
+      # application to run locally but hopefully prevent an invalid deployment
+      config.lambda.layers = [JetsGemLayer.arn]
+
+      # ...
+   end
+end
 ```
 
 3. Add this gem to your Gemfile:
@@ -46,7 +55,6 @@ gem 'jets_gem_layer'
 # Rakefile
 
 require 'jets'
-require 'jets_gem_layer'
 require_relative 'config/application'
 
 Jets.application.load_tasks
