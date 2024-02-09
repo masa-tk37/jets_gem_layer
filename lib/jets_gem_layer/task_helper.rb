@@ -30,8 +30,8 @@ module JetsGemLayer
     def arn
       # We do not want to do any of this when running in the lambda environment
       # as it is only required for deployment.
-      @arn ||= if ENV['LAMBDA_TASK_ROOT']
-                 'no-op-while-running-in-lambda'
+      @arn ||= if ENV['LAMBDA_TASK_ROOT'] || ENV['JETS_NO_INTERNET']
+                 'no-op-while-running-in-lambda-or-test'
                else
                  published_arn
                end

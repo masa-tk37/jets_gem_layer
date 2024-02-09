@@ -46,6 +46,7 @@ gem 'jets_gem_layer'
 # Rakefile
 
 require 'jets'
+require 'jets_gem_layer'
 require_relative 'config/application'
 
 Jets.application.load_tasks
@@ -81,6 +82,9 @@ Within your project directory (example for development environment) or through y
    * Deploy your application
 3. `JETS_ENV=development rake gem_layer:cleanup_published`
    * After a successful deploy, you may run this to cleanup the old gem layer version(s) no longer in use
+
+**Important:** The zip command must be installed in your environment or the layer will fail to zip and upload. Perhaps we will
+switch to rubyzip in the future.
 
 ## Acknowledgements
 A big thank you to the authors of [Lambda Layer Cake](https://github.com/loganb/lambda-layer-cake), which served as a reference.

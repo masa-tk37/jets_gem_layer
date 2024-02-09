@@ -78,8 +78,8 @@ RSpec.describe JetsGemLayer::TaskHelper do
       after { ENV['LAMBDA_TASK_ROOT'] = nil }
 
       it 'returns no-op string, memoizes value' do
-        expect(instance.arn).to eq 'no-op-while-running-in-lambda'
-        expect(instance.instance_variable_get(:@arn)).to eq 'no-op-while-running-in-lambda'
+        expect(instance.arn).to eq 'no-op-while-running-in-lambda-or-test'
+        expect(instance.instance_variable_get(:@arn)).to eq 'no-op-while-running-in-lambda-or-test'
       end
 
       context 'when memoized' do
