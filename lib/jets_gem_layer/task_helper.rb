@@ -101,6 +101,9 @@ module JetsGemLayer
     def build_layer
       FileUtils.mkdir_p(inputs_dir)
       FileUtils.cp(INPUT_FILES.existing, inputs_dir)
+      puts 'Running docker to build layer'
+      command = docker_run_cmd
+      puts command.join(' ')
       system(*docker_run_cmd) or raise $CHILD_STATUS.to_s
       zip_layer
     end
