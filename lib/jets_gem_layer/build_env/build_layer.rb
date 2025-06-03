@@ -28,7 +28,7 @@ def main
 
   warn('Building gems...')
   FileUtils.mkdir_p('/tmp/build/bundle')
-  system('bundle', 'lock', '--add-platform', 'x86_64-linux')
+  system('bundle', 'config', 'set', 'force_ruby_platform', 'true')
   system('bundle', 'config', 'set', '--local', 'deployment', 'true')
   system('bundle', 'config', 'set', '--local', 'path', '/tmp/build/bundle')
   unless system('bundle', 'install')
